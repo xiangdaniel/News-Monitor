@@ -1,1 +1,1 @@
-# fake_news_detection
+# Distributed System of News Monitor based on Social Media 
