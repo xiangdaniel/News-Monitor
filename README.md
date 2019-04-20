@@ -1,1 +1,1 @@
-# Distributed System of News Monitor based on Social Media 
+# Distributed System News Monitor
