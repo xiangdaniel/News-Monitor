@@ -1,1 +1,2 @@
-# Distributed System News Monitor
+# Distributed News Monitor System
+
