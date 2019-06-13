@@ -1,8 +1,5 @@
 """
 Twitter NLP
-Select features and calculate the weights to facilitate recommendation
-Copyright (c) 2019 Daniel D Xiang
-Licensed under the MIT License
 Written by Daniel Xiang
 """
 
@@ -36,7 +33,6 @@ sc = spark.sparkContext
 sc.addPyFile("selenium_client.py")
 sc.addPyFile("call_selenium_client.py")
 udf_get_comments = functions.udf(call_selenium_client.Comments(), returnType=types.ArrayType(types.ArrayType(types.StringType())))
-#udf_get_comments = functions.udf(call_selenium_client.Comments(), returnType=types.ArrayType(types.StringType()))
 
 
 #@functions.udf(returnType=types.ArrayType(types.StringType()))
@@ -87,7 +83,6 @@ udf_classify_tokens = functions.udf(classify_tokens, returnType=types.StringType
 
 def main(topic):
     # 1. Load Data, Combine keywords, tweet_urls by news_url, Add id
-    # data = spark.read.csv(inputs, schema=tweets_schema).repartition(50)  # .repartition(50).select('business_id', 'stars', 'text')
     messages = spark.readStream.format('kafka') \
         .option('kafka.bootstrap.servers', 'localhost:9092') \
         .option('subscribe', topic)\
@@ -122,7 +117,6 @@ def main(topic):
     print('finish load data')
 
     # 2. Scrap the news_text and tweets_comments
-    # data = data.withColumn('news_text', udf_get_news_text(data['news_url']))
     data = data.withColumn('tweets_infos', udf_get_comments(data['tweet_url']))
     data = data.withColumn('tweets_info', functions.explode(data['tweets_infos']))
     data = data.select('news_id',
