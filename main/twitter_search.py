@@ -26,7 +26,6 @@ def get_tweet_info(tweet):
     text = tweet['text']
     tweet_url = 'https://twitter.com/' + tweet['user']['screen_name'] + '/status/' + tweet['id_str']
     news_url = None
-    # print(tweet)
     if tweet['entities']['urls']:
         news_url = tweet['entities']['urls'][0]['expanded_url']
 
@@ -36,13 +35,8 @@ def get_tweet_info(tweet):
         text = tweet['retweeted_status']['text']
         tweet_url = 'https://twitter.com/' + tweet['retweeted_status']['user']['screen_name'] + '/status/' + \
                     tweet['retweeted_status']['id_str']
-        # if 'media' in tweet['retweeted_status']['entities'].keys():
-        #     news_url = tweet['retweeted_status']['entities']['media'][0]['expanded_url']
         if tweet['retweeted_status']['entities']['urls'] and tweet['retweeted_status']['entities']['urls'][0]['url'].startswith('https'):
             news_url = tweet['retweeted_status']['entities']['urls'][0]['expanded_url']
-
-        # if tweet['id'] == 1111483393781317638:
-        #     print(data)
     return tweet['id'], created_at, day, hour, int(retweet_count), int(favorite_count), text, tweet_url, news_url, tweet
 
 
@@ -54,37 +48,19 @@ def get_news_url(keyword):
     # tso.set_negative_attitude_filter()
     tso.set_link_filter()
     ts = TwitterSearch(
-        consumer_key="zdxmxeAtMbWFaE1kGBT7vLNVt",  # aY5Lo6Xz9V8WEiMD9gCXkacYx zdxmxeAtMbWFaE1kGBT7vLNVt
-        consumer_secret="EPb5S6y9vCGr1qHbhSdcwiaCBbAszDdJ12cdrLXzlzdFEdFuek",  # dtc6GeUqTSsel8YqqjJFAcA8Jupr7pYBHZVBSiRYBMuLzE5k1g EPb5S6y9vCGr1qHbhSdcwiaCBbAszDdJ12cdrLXzlzdFEdFuek
-        access_token="1112141420108759042-KAOY2m0mAju39MbHJrnH7MBuU55C9Y",  # 2865195647-BZAx398on0JTNPA5ejjpFxJOLek7DsfBD06vWqg 1112141420108759042-KAOY2m0mAju39MbHJrnH7MBuU55C9Y
-        access_token_secret="yWeARXoomgrtv316s9vHBILvFG7VbKLK3Njyyr3rhkFle"  # NjFAvDrzY6jC7PZ4NCneuZGouccFbTUty95mMlGfkO75t yWeARXoomgrtv316s9vHBILvFG7VbKLK3Njyyr3rhkFle
+        consumer_key="your key",  
+        consumer_secret="your secret",  
+        access_token="your token",  
+        access_token_secret="your token secret"  
     )
-    # ts = TwitterSearch(
-    #     consumer_key="aY5Lo6Xz9V8WEiMD9gCXkacYx",
-    #     consumer_secret="dtc6GeUqTSsel8YqqjJFAcA8Jupr7pYBHZVBSiRYBMuLzE5k1g",
-    #     access_token="2865195647-BZAx398on0JTNPA5ejjpFxJOLek7DsfBD06vWqg",
-    #     access_token_secret="NjFAvDrzY6jC7PZ4NCneuZGouccFbTUty95mMlGfkO75t"
-    # )
 
     list_tweets = []
     tweets = ts.search_tweets_iterable(tso)
     for tweet in tweets:
         list_tweets.append(tweet)
-        # print(tweet)
-
-    # list(map(lambda x: (x['created_at'], x['retweet_count']), data_list))
-    # Fri Mar 01 23:59:55 +0000 2019
 
     list_info = list(map(get_tweet_info, list_tweets))
     list_url = []
-    # print(data_list)
-    # with open(TW_DIR + todayString() + '-' + keyword + '-urls.csv', 'w') as out:
-    #     csv_out = csv.writer(out)
-    #     # csv_out.writerow(['Created_at', 'Date', 'Time', 'retweet_count', 'favorite_count', 'text', 'url', 'id', 'te'])
-    #     for row in data_list:
-    #         if row[3] < 1000 or exclude_url(row[6]):
-    #             continue
-    #         csv_out.writerow(row)
 
     for row in list_info:
         print(row)
@@ -111,11 +87,9 @@ if __name__ == '__main__':
 
         data = {}
         print(keywords)
-        # keywords = ['Lori Lightfoot']
         with open(TW_DIR + todayString() + '_predata.csv', 'w') as outfile:
             writer = csv.writer(outfile, delimiter=',')
             for keyword in keywords:
-                # print(keyword)
                 urls = get_news_url(keyword)
                 if len(urls) == 0:
                     continue
@@ -133,11 +107,6 @@ if __name__ == '__main__':
         df = df.loc[df.groupby(['news_url'])['favorite_count'].idxmax()]
         df['news_id'] = df.index.to_series().map(lambda x: uuid4())
         df = df[['news_id', 'news_keyword', 'news_url', 'tweet_url', 'retweet_count', 'favorite_count']]
-        # df = df.groupby(['news_url', 'tweet_url']).agg({'news_keyword': ' / '.join})
-        # df = df.groupby(['news_keyword', 'news_url', 'tweet_url']).agg({'favorite_count': 'max'})
-        # df = df.reset_index()
-        # df['news_id'] = df.index.to_series().map(lambda x: uuid4())
-        # df = df.set_index('news_id')
         df.to_csv(TW_DIR + todayString() + '_data.csv', header=False, index=False, line_terminator='\n')
         print('complete')
         time.sleep(interval)
