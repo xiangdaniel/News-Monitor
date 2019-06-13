@@ -1,8 +1,5 @@
 """
 News NLP
-Select features and calculate the weights to facilitate recommendation
-Copyright (c) 2019 Daniel D Xiang
-Licensed under the MIT License
 Written by Daniel Xiang
 """
 
@@ -81,7 +78,6 @@ udf_sentiment_score = functions.udf(sentiment_score, returnType=types.ArrayType(
 
 def main(topic):
     # 1. Load Data, Combine keywords, tweet_urls by news_url, Add id
-    # data = spark.read.csv(inputs, schema=tweets_schema).repartition(50)  # .repartition(50).select('business_id', 'stars', 'text')
     messages = spark.readStream.format('kafka') \
         .option('kafka.bootstrap.servers', 'localhost:9092') \
         .option('subscribe', topic)\
@@ -123,7 +119,7 @@ def main(topic):
     # 4. Select Features
     nlp_data = nlp_data.withColumn('news_tokens', udf_morphy(nlp_data['news_tokens']))
     # nlp_data = nlp_data.withColumn('tweets_tokens', udf_morphy(nlp_data['tweets_tokens']))
-    #nlp_data = nlp_data.select(nlp_data['business_id'], review['stars'], udf_morphy(review['tokens']).alias('tokens'))
+    # nlp_data = nlp_data.select(nlp_data['business_id'], review['stars'], udf_morphy(review['tokens']).alias('tokens'))
     nlp_data = nlp_data.where(functions.size(nlp_data['news_tokens']) > 0)
     # nlp_data = nlp_data.where(functions.size(nlp_data['tweets_tokens']) > 0)
     # nlp_data_score = nlp_data_score.withColumn('tweets_tokens', functions.split('tweets_tokens', '\s+'))
